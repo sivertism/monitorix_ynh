@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Import common cmd
+source ./_common.sh
+
+# Init script
+init_script
+
+# Retrieve app settings
+domain=$(ynh_app_setting_get "$app" domain)
+
+# Stop service
+sudo service monitorix stop || true
+
+# Remove nginx configuration file
+sudo rm -f /etc/nginx/conf.d/$domain.d/$app.conf
+
+# Drop MySQL database and user
+dbname=$app
+dbuser=$app
+ynh_mysql_drop_db "$dbname" || true
+ynh_mysql_drop_user "$dbuser" || true
+
+# Autoremove package
+ynh_package_autoremove monitorix
+
+# Reload nginx service
+sudo service nginx reload

@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Import common cmd
+source ./_common.sh
+
+# Init script
+init_script
+
+# Retrieve app settings
+domain=$(ynh_app_setting_get "$app" domain)
+path=$(ynh_app_setting_get "$app" path)
+http_port=$(ynh_app_setting_get "$app" http_port)
+nginx_status_port=$(ynh_app_setting_get "$app" nginx_status_port)
+dbuser=$app
+dbname=$app
+dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
+
+# Correct path if it is not correct
+correct_path
+
+# Download package
+get_source
+
+# Update package    
+sudo dpkg -i /tmp/monitorix.deb
+sudo rm -rf /etc/monitorix/conf.d/00-debian.conf
+
+# Modify Nginx configuration file and copy it to Nginx conf directory
+nginx_conf=../conf/nginx.conf
+sed -i "s@YNH_WWW_PATH@$path@g" $nginx_conf
+sed -i "s@SERVICE_PORT@$http_port@g" $nginx_conf
+sudo cp $nginx_conf /etc/nginx/conf.d/$domain.d/$app.conf
+
+# Add special hostname for monitorix status
+nginx_status_conf=../conf/nginx_status.conf
+sed -i "s@PORT@$nginx_status_port@g" $nginx_status_conf
+sudo cp $nginx_status_conf /etc/nginx/conf.d/monitorix_status.conf
+
+# Update monitorix configuration
+monitorix_conf=../conf/monitorix.conf
+sed -i "s@SERVICE_PORT@$http_port@g" $monitorix_conf
+sed -i "s@YNH_DOMAIN@$domain@g" $monitorix_conf
+sed -i "s@NGINX_STATUS_PORT@$nginx_status_port@g" $monitorix_conf
+sed -i "s@YNH_WWW_PATH@$path@g" $monitorix_conf
+sed -i "s@MYSQL_USER@$dbuser@g" $monitorix_conf
+sed -i "s@MYSQL_PASSWORD@$dbpass@g" $monitorix_conf
+sudo cp $monitorix_conf /etc/monitorix/monitorix.conf
+
+# Reload services
+sudo service nginx reload
+sudo service monitorix restart

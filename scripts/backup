@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Exit on command errors and treat unset variables as an error
+set -eu
+
+# See comments in install script
+app=$YNH_APP_INSTANCE_NAME
+
+# Source YunoHost helpers
+source /usr/share/yunohost/helpers
+
+# # Dump the database
+dbname=$app
+dbuser=$app
+dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
+mysqldump -u "$dbuser" -p"$dbpass" --no-create-db "$dbname" > ./dump.sql
+
+# Copy NGINX configuration
+domain=$(ynh_app_setting_get "$app" domain)
+ynh_backup "/etc/nginx/conf.d/${domain}.d/${app}.conf" "nginx.conf"
+ynh_backup "/etc/nginx/conf.d/monitorix_status.conf" "/monitorix_status.conf"
+
+# Copy Monitorix configuration
+ynh_backup "/etc/monitorix" "config"
