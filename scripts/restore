@@ -1,7 +1,24 @@
 #!/bin/bash
 
-# Import common cmd
-source ./_common.sh
+######## Actually we cant use common script in backup / restore script see this issue for more informations : https://dev.yunohost.org/issues/621
+# # Import common cmd
+# source ./_common.sh
+#
+
+######## We implement manually this fonctions 
+
+init_script() {
+    # Exit on command errors and treat unset variables as an error
+    set -eu
+
+    # Source YunoHost helpers
+    source /usr/share/yunohost/helpers
+
+    # Retrieve arguments
+    app=$YNH_APP_INSTANCE_NAME
+}
+
+######## End of common fonctions
 
 # Init script
 init_script
@@ -14,7 +31,7 @@ domain=$(ynh_app_setting_get "$app" domain)
 path=$(ynh_app_setting_get "$app" path)
 
 # Correct path if it is not correct
-correct_path
+CHECK_PATH
 
 # Check domain/path availability
 sudo yunohost app checkurl "${domain}${path}" -a "$app" \
