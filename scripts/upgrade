@@ -16,7 +16,7 @@ dbname=$app
 dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
 
 # Correct path if it is not correct
-correct_path
+CHECK_PATH
 
 # Download package
 get_source

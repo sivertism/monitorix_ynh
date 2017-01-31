@@ -11,7 +11,7 @@ domain=$YNH_APP_ARG_DOMAIN
 path=$YNH_APP_ARG_PATH
 
 # Correct path if it is not correct
-correct_path
+CHECK_PATH
 
 # Check domain/path availability
 sudo yunohost app checkurl "${domain}${path}" -a "$app" \
@@ -35,18 +35,10 @@ ynh_app_setting_set "$app" mysqlpwd "$dbpass"
 ynh_mysql_create_db "$dbname" "$dbuser" "$dbpass"
 
 # Find a port for built-in monitorix HTTP server
-port=''
-findPort () {
-    port=$1
-
-    while ! sudo yunohost app checkport $port ; do
-        port=$(($port + 1))
-    done
-}
-findPort 8080
+FIND_PORT 8080
 http_port=$port
 ynh_app_setting_set $app http_port $http_port
-findPort $(($port +1))
+FIND_PORT $(($port +1))
 nginx_status_port=$port
 ynh_app_setting_set $app nginx_status_port $nginx_status_port
 

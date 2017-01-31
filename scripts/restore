@@ -1,7 +1,45 @@
 #!/bin/bash
 
-# Import common cmd
-source ./_common.sh
+######## Actually we cant use common script in backup / restore script see this issue for more informations : https://dev.yunohost.org/issues/621
+# # Import common cmd
+# source ./_common.sh
+#
+
+######## We implement manually this fonctions 
+
+md5sum="7314ad6fcd014a34c2e4e8a95455bcaa"
+
+init_script() {
+    # Exit on command errors and treat unset variables as an error
+    set -eu
+
+    # Source YunoHost helpers
+    source /usr/share/yunohost/helpers
+
+    # Retrieve arguments
+    app=$YNH_APP_INSTANCE_NAME
+}
+
+get_source() {
+
+    wget -q -O '/tmp/monitorix.deb' 'http://www.monitorix.org/monitorix_3.9.0-izzy1_all.deb'
+
+    if [[ ! -e '/tmp/monitorix.deb' ]] || [[ $(md5sum '/tmp/monitorix.deb' | cut -d' ' -f1) != $md5sum ]]
+    then
+        ynh_die "Error : can't get monitorix debian package"
+    fi
+}
+
+CHECK_PATH () {	# Vérifie la présence du / en début de path. Et son absence à la fin.
+	if [ "${path:0:1}" != "/" ]; then    # Si le premier caractère n'est pas un /
+		path="/$path"    # Ajoute un / en début de path
+	fi
+	if [ "${path:${#path}-1}" == "/" ] && [ ${#path} -gt 1 ]; then    # Si le dernier caractère est un / et que ce n'est pas le seul caractère.
+		path="${path:0:${#path}-1}"	# Supprime le dernier caractère
+	fi
+}
+
+######## End of common fonctions
 
 # Init script
 init_script
@@ -14,7 +52,7 @@ domain=$(ynh_app_setting_get "$app" domain)
 path=$(ynh_app_setting_get "$app" path)
 
 # Correct path if it is not correct
-correct_path
+CHECK_PATH
 
 # Check domain/path availability
 sudo yunohost app checkurl "${domain}${path}" -a "$app" \
@@ -46,3 +84,4 @@ sudo cp -a ./config "/etc/monitorix"
 
 # Restart webserver
 sudo service nginx reload
+sudo service monitorix restart
