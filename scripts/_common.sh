@@ -2,6 +2,7 @@
 
 ## Adapt md5sum while you update app
 md5sum="7314ad6fcd014a34c2e4e8a95455bcaa"
+monitorix_version="3.9.0"
 
 init_script() {
     # Exit on command errors and treat unset variables as an error
@@ -16,7 +17,7 @@ init_script() {
 
 get_source() {
 
-    wget -q -O '/tmp/monitorix.deb' 'http://www.monitorix.org/monitorix_3.9.0-izzy1_all.deb'
+    wget -q -O '/tmp/monitorix.deb' "http://www.monitorix.org/monitorix_${monitorix_version}-izzy1_all.deb"
 
     if [[ ! -e '/tmp/monitorix.deb' ]] || [[ $(md5sum '/tmp/monitorix.deb' | cut -d' ' -f1) != $md5sum ]]
     then
