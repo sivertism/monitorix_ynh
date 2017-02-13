@@ -65,6 +65,7 @@ get_source
 ynh_package_update
 ynh_package_install rrdtool perl libwww-perl libmailtools-perl libmime-lite-perl librrds-perl libdbi-perl libxml-simple-perl libhttp-server-simple-perl libconfig-general-perl
 sudo dpkg -i /tmp/monitorix.deb
+sudo rm -rf /etc/monitorix/conf.d/00-debian.conf
 ynh_package_install -f
 
 # # Create and restore the database
@@ -79,7 +80,8 @@ sudo cp -a ./nginx.conf "/etc/nginx/conf.d/${domain}.d/${app}.conf"
 sudo cp -a ./monitorix_status.conf "/etc/nginx/conf.d/monitorix_status.conf"
 
 # Restore Monitorix configuration
-sudo cp -a ./config "/etc/monitorix"
+sudo cp -a ./config/. "/etc/monitorix/."
+sudo cp -a ./data/. "/var/lib/monitorix/."
 
 
 # Restart webserver

@@ -36,3 +36,7 @@ ynh_backup "/etc/nginx/conf.d/monitorix_status.conf" "monitorix_status.conf"
 
 # Copy Monitorix configuration
 ynh_backup "/etc/monitorix" "config"
+
+# Copy Monitorix data
+ynh_backup "/var/lib/monitorix" "data"
+
