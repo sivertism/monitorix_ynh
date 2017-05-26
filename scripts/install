@@ -62,6 +62,10 @@ sed -i "s@MYSQL_USER@$dbuser@g" $monitorix_conf
 sed -i "s@MYSQL_PASSWORD@$dbpass@g" $monitorix_conf
 sudo cp $monitorix_conf /etc/monitorix/monitorix.conf
 
+# register yunohost service
+sudo yunohost service add monitorix
+
 # Reload services
-sudo service nginx reload
 sudo service monitorix restart
+sudo yunohost app ssowatconf
+sudo service nginx reload

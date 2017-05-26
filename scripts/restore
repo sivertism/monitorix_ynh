@@ -117,5 +117,6 @@ sudo cp -a ./data/. "/var/lib/monitorix/."
 
 
 # Restart webserver
-sudo service nginx reload
 sudo service monitorix restart
+sudo yunohost app ssowatconf
+sudo service nginx reload

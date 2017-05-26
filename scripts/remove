@@ -24,5 +24,7 @@ ynh_mysql_drop_user "$dbuser" || true
 # Autoremove package
 ynh_package_autoremove monitorix
 
+sudo yunohost service remove monitorix
+
 # Reload nginx service
 sudo service nginx reload

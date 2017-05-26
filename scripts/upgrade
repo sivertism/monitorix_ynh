@@ -47,5 +47,6 @@ sed -i "s@MYSQL_PASSWORD@$dbpass@g" $monitorix_conf
 sudo cp $monitorix_conf /etc/monitorix/monitorix.conf
 
 # Reload services
-sudo service nginx reload
 sudo service monitorix restart
+sudo yunohost app ssowatconf
+sudo service nginx reload
