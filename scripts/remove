@@ -1,19 +1,23 @@
 #!/bin/bash
 
+# Source YunoHost helpers
+source /usr/share/yunohost/helpers
+
+# Stop script if errors
+set -u
+
 # Import common cmd
 source ./_common.sh
-
-# Init script
-init_script
 
 # Retrieve app settings
 domain=$(ynh_app_setting_get "$app" domain)
 
 # Stop service
-sudo service monitorix stop || true
+systemctl stop monitorix.service
 
-# Remove nginx configuration file
-sudo rm -f /etc/nginx/conf.d/$domain.d/$app.conf
+# Suppression de la configuration nginx
+ynh_secure_remove "/etc/nginx/conf.d/$domain.d/$app.conf"
+systemctl reload nginx.service
 
 # Drop MySQL database and user
 dbname=$app
@@ -22,9 +26,7 @@ ynh_mysql_drop_db "$dbname" || true
 ynh_mysql_drop_user "$dbuser" || true
 
 # Autoremove package
+ynh_remove_app_dependencies
 ynh_package_autoremove monitorix
 
-sudo yunohost service remove monitorix
-
-# Reload nginx service
-sudo service nginx reload
+yunohost service remove monitorix

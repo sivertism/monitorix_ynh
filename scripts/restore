@@ -1,122 +1,37 @@
 #!/bin/bash
 
-######## Actually we cant use common script in backup / restore script see this issue for more informations : https://dev.yunohost.org/issues/621
-# # Import common cmd
-# source ./_common.sh
-#
+# Source YunoHost helpers
+source /usr/share/yunohost/helpers
 
-######## We implement manually this fonctions 
+# Stop script if errors
+ynh_abort_if_errors
 
-## Adapt md5sum while you update app
-md5sum="7314ad6fcd014a34c2e4e8a95455bcaa"
-monitorix_version="3.9.0"
-
-init_script() {
-    # Exit on command errors and treat unset variables as an error
-    set -eu
-
-    # Source YunoHost helpers
-    source /usr/share/yunohost/helpers
-
-    # Retrieve arguments
-    app=$YNH_APP_INSTANCE_NAME
-}
-
-get_source() {
-
-    wget -q -O '/tmp/monitorix.deb' "http://www.monitorix.org/monitorix_${monitorix_version}-izzy1_all.deb"
-
-    if [[ ! -e '/tmp/monitorix.deb' ]] || [[ $(md5sum '/tmp/monitorix.deb' | cut -d' ' -f1) != $md5sum ]]
-    then
-        ynh_die "Error : can't get monitorix debian package"
-    fi
-}
-
-CHECK_VAR () {	# Vérifie que la variable n'est pas vide.
-# $1 = Variable à vérifier
-# $2 = Texte à afficher en cas d'erreur
-	test -n "$1" || (echo "$2" >&2 && false)
-}
-
-CHECK_PATH () {	# Vérifie la présence du / en début de path. Et son absence à la fin.
-	if [ "${path:0:1}" != "/" ]; then    # Si le premier caractère n'est pas un /
-		path="/$path"    # Ajoute un / en début de path
-	fi
-	if [ "${path:${#path}-1}" == "/" ] && [ ${#path} -gt 1 ]; then    # Si le dernier caractère est un / et que ce n'est pas le seul caractère.
-		path="${path:0:${#path}-1}"	# Supprime le dernier caractère
-	fi
-}
-
-CHECK_DOMAINPATH () {	# Vérifie la disponibilité du path et du domaine.
-	sudo yunohost app checkurl $domain$path -a $app
-}
-
-CHECK_FINALPATH () {	# Vérifie que le dossier de destination n'est pas déjà utilisé.
-	final_path=/var/www/$app
-	if [ -e "$final_path" ]
-	then
-		echo "This path already contains a folder" >&2
-		false
-	fi
-}
-
-### REMOVE SCRIPT
-
-REMOVE_NGINX_CONF () {	# Suppression de la configuration nginx
-	if [ -e "/etc/nginx/conf.d/$domain.d/$app.conf" ]; then	# Delete nginx config
-		echo "Delete nginx config"
-		sudo rm "/etc/nginx/conf.d/$domain.d/$app.conf"
-		sudo service nginx reload
-	fi
-}
-
-
-######## End of common fonctions
-
-# Init script
-init_script
-
-# Note: each files and directories you've saved using the ynh_backup helper
-# will be located in the current directory, regarding the last argument.
+# Import common cmd
+source ../settings/scripts/_common.sh
 
 # Retrieve old app settings
 domain=$(ynh_app_setting_get "$app" domain)
-path=$(ynh_app_setting_get "$app" path)
-
-# Correct path if it is not correct
-CHECK_PATH
+path=$(ynh_normalize_url_path $(ynh_app_setting_get "$app" path))
 
 # Check domain/path availability
-sudo yunohost app checkurl "${domain}${path}" -a "$app" \
-    || ynh_die "Path not available: ${domain}${path}"
+ynh_webpath_available $domain $path || ynh_die "$domain/$path is not available, please use an other domain or path."
+
+# Download package
+get_source
 
 # Download package
 get_source
 
 # Install package    
-ynh_package_update
-ynh_package_install rrdtool perl libwww-perl libmailtools-perl libmime-lite-perl librrds-perl libdbi-perl libxml-simple-perl libhttp-server-simple-perl libconfig-general-perl
-sudo dpkg -i /tmp/monitorix.deb
-sudo rm -rf /etc/monitorix/conf.d/00-debian.conf
-ynh_package_install -f
+install_dependances
 
-# # Create and restore the database
-dbname=$app
+# Create user for database
 dbuser=$app
 dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
-ynh_mysql_create_db "$dbname" "$dbuser" "$dbpass"
-ynh_mysql_connect_as "$dbuser" "$dbpass" "$dbname" < ./dump.sql
+ynh_mysql_create_user $dbuser $dbpass
 
-# Restore NGINX configuration
-sudo cp -a ./nginx.conf "/etc/nginx/conf.d/${domain}.d/${app}.conf"
-sudo cp -a ./monitorix_status.conf "/etc/nginx/conf.d/monitorix_status.conf"
+# Restore all config and data
+ynh_restore
 
-# Restore Monitorix configuration
-sudo cp -a ./config/. "/etc/monitorix/."
-sudo cp -a ./data/. "/var/lib/monitorix/."
-
-
-# Restart webserver
-sudo service monitorix restart
-sudo yunohost app ssowatconf
-sudo service nginx reload
+# Reload services
+systemctl restart monitorix.service

@@ -6,6 +6,7 @@
         "en": "A monitoring tools",
         "fr": "Un outils de monitoring"
     },
+	"version": "3.9.0",
     "url": "http://monitorix.org",
     "license": "free",
     "maintainer": {
@@ -13,7 +14,7 @@
         "email": "josue@familletille.ch"
     },
     "requirements": {
-        "yunohost": ">> 2.4.0"
+		"yunohost": ">= 2.6.4"
     },
     "multi_instance": false,
     "services": [

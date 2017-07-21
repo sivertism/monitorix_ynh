@@ -1,33 +1,17 @@
 #!/bin/bash
 
-######## Actually we cant use common script in backup / restore script see this issue for more informations : https://dev.yunohost.org/issues/621
-# # Import common cmd
-# source ./_common.sh
-#
+# Source YunoHost helpers
+source /usr/share/yunohost/helpers
 
-######## We implement manually this fonctions 
+# Stop script if errors
+ynh_abort_if_errors
 
-init_script() {
-    # Exit on command errors and treat unset variables as an error
-    set -eu
+# Import common cmd
+source ../settings/scripts/_common.sh
 
-    # Source YunoHost helpers
-    source /usr/share/yunohost/helpers
+# Retrieve arguments
+domain=$(ynh_app_setting_get $app domain)
 
-    # Retrieve arguments
-    app=$YNH_APP_INSTANCE_NAME
-}
-
-######## End of common fonctions
-
-# Init script
-init_script
-
-# # Dump the database
-dbname=$app
-dbuser=$app
-dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
-mysqldump -u "$dbuser" -p"$dbpass" --no-create-db "$dbname" > ./dump.sql
 
 # Copy NGINX configuration
 domain=$(ynh_app_setting_get "$app" domain)

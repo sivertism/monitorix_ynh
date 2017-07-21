@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Source YunoHost helpers
+source /usr/share/yunohost/helpers
+
+# Import common cmd
+source ./_common.sh
+
+# Retrive arguments
+old_domain=$YNH_APP_OLD_DOMAIN
+old_path=$(ynh_normalize_url_path $YNH_APP_OLD_PATH)
+new_domain=$YNH_APP_NEW_DOMAIN
+new_path=$(ynh_normalize_url_path $YNH_APP_NEW_PATH)
+http_port=$(ynh_app_setting_get "$app" http_port)
+
+# CHECK WHICH PARTS SHOULD BE CHANGED
+change_domain=0
+if [ "$old_domain" != "$new_domain" ]
+then
+	change_domain=1
+fi
+
+change_path=0
+if [ "$old_path" != "$new_path" ]
+then
+	change_path=1
+fi
+
+# STANDARD MODIFICATIONS
+# MODIFY URL IN NGINX CONF
+nginx_conf_path=/etc/nginx/conf.d/$old_domain.d/$app.conf
+
+# Change the path in the nginx config file
+if [ $change_path -eq 1 ]
+then
+	ynh_replace_string "location $old_path" "location $new_path" "$nginx_conf_path"
+	ynh_replace_string "http://127.0.0.1:$http_port$old_path;" "http://127.0.0.1:$http_port$new_path;" "$nginx_conf_path"
+	ynh_replace_string "location ~ ^$old_path/(.+\.png)$" "location ~ ^$new_path/(.+\.png)$" "$nginx_conf_path"
+fi
+
+# Change the domain for nginx
+if [ $change_domain -eq 1 ]
+then
+	sudo mv $nginx_conf_path /etc/nginx/conf.d/$new_domain.d/$app.conf
+fi
+
+# Update Monitorix Config
+ynh_replace_string "base_url = $old_path" "base_url = $new_path" /etc/monitorix/monitorix.conf
+ynh_replace_string "base_cgi = $old_path-cgi" "base_cgi = $new_path-cgi" /etc/monitorix/monitorix.conf
+ynh_replace_string "url_prefix = http://127.0.0.1:$http_port$old_path" "url_prefix = http://127.0.0.1:$http_port$new_path" /etc/monitorix/monitorix.conf
+ynh_replace_string "from_address = noreply@$old_domain" "from_address = noreply@$new_domain" /etc/monitorix/monitorix.conf
+
+# Reload services
+sudo systemctl reload nginx.service
+sudo systemctl restart monitorix.service
