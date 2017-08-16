@@ -31,7 +31,11 @@ dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
 ynh_mysql_create_user $dbuser $dbpass
 
 # Restore all config and data
+ynh_secure_remove /etc/monitorix # we remove the directory because if it is not empty the ynh_restore cmd fail
 ynh_restore
+
+# Reload nginx
+systemctl reload nginx.service
 
 # Reload services
 systemctl restart monitorix.service
