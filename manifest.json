@@ -8,7 +8,7 @@
     },
 	"version": "3.9.0",
     "url": "http://monitorix.org",
-    "license": "free",
+    "license": "GPL-2.0",
     "maintainer": {
         "name": "Josué Tille",
         "email": "josue@familletille.ch"
