@@ -25,6 +25,9 @@ dbuser=$app
 ynh_mysql_drop_db "$dbname" || true
 ynh_mysql_drop_user "$dbuser" || true
 
+# Remove data
+ynh_secure_remove /var/lib/monitorix
+
 # Autoremove package
 ynh_remove_app_dependencies
 ynh_package_autoremove monitorix

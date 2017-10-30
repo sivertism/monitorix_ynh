@@ -3,8 +3,8 @@
 app=$YNH_APP_INSTANCE_NAME
 
 ## Adapt md5sum while you update app
-md5sum="7314ad6fcd014a34c2e4e8a95455bcaa"
-monitorix_version="3.9.0"
+sha256sum="3fb8b4a4f7aeeeafccc6dc5b232f82d5761be80fe8e82008bc768f805fe5a744"
+monitorix_version="3.10.0"
 
 install_dependances() {
 	ynh_install_app_dependencies rrdtool perl libwww-perl libmailtools-perl libmime-lite-perl librrds-perl libdbi-perl libxml-simple-perl libhttp-server-simple-perl libconfig-general-perl pflogsumm
@@ -17,7 +17,7 @@ install_dependances() {
 get_source() {
     wget -q -O '/tmp/monitorix.deb' "http://www.monitorix.org/monitorix_${monitorix_version}-izzy1_all.deb"
 
-    if [[ ! -e '/tmp/monitorix.deb' ]] || [[ $(md5sum '/tmp/monitorix.deb' | cut -d' ' -f1) != $md5sum ]]
+    if [[ ! -e '/tmp/monitorix.deb' ]] || [[ $(sha256sum '/tmp/monitorix.deb' | cut -d' ' -f1) != $sha256sum ]]
     then
         ynh_die "Error : can't get monitorix debian package"
     fi

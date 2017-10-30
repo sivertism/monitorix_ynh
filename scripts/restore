@@ -19,9 +19,6 @@ ynh_webpath_available $domain $path || ynh_die "$domain/$path is not available, 
 # Download package
 get_source
 
-# Download package
-get_source
-
 # Install package    
 install_dependances
 
@@ -32,6 +29,7 @@ ynh_mysql_create_user $dbuser $dbpass
 
 # Restore all config and data
 ynh_secure_remove /etc/monitorix # we remove the directory because if it is not empty the ynh_restore cmd fail
+ynh_secure_remove /var/lib/monitorix
 ynh_restore
 
 # Reload nginx
