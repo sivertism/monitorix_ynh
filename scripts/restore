@@ -16,11 +16,11 @@ path=$(ynh_normalize_url_path $(ynh_app_setting_get "$app" path))
 # Check domain/path availability
 ynh_webpath_available $domain $path || ynh_die "$domain/$path is not available, please use an other domain or path."
 
-# Download package
-get_source
-
 # Install package    
 install_dependances
+
+# Download package and install it
+get_install_source
 
 # Create user for database
 dbuser=$app

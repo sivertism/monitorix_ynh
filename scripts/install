@@ -17,11 +17,11 @@ path=$(ynh_normalize_url_path $YNH_APP_ARG_PATH)
 test $(ynh_webpath_available $domain $path) == 'True' || ynh_die "$domain$path is not available, please use an other domain or path."
 ynh_webpath_register $app $domain $path
 
-# Download package
-get_source
-
 # Install package    
 install_dependances
+
+# Download package and install it
+get_install_source
 
 # # Generate MySQL user
 dbuser=$app

@@ -18,12 +18,8 @@ dbuser=$app
 dbname=$app
 dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
 
-# Download package
-get_source
-
-# Update package    
-dpkg -i /tmp/monitorix.deb
-ynh_secure_remove /etc/monitorix/conf.d/00-debian.conf
+# Download package and install it
+get_install_source
 
 # Update nginx config
 config_nginx

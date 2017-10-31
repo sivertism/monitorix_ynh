@@ -16,19 +16,19 @@ APP_VERSION=$(get_app_version_from_json)
 
 install_dependances() {
 	ynh_install_app_dependencies rrdtool perl libwww-perl libmailtools-perl libmime-lite-perl librrds-perl libdbi-perl libxml-simple-perl libhttp-server-simple-perl libconfig-general-perl pflogsumm
-	ynh_package_update
-	dpkg -i /tmp/monitorix.deb
-	ynh_secure_remove /etc/monitorix/conf.d/00-debian.conf
-	ynh_package_install -f
 }
 
-get_source() {
+get_install_source() {
     wget -q -O '/tmp/monitorix.deb' "http://www.monitorix.org/monitorix_${APP_VERSION}-izzy1_all.deb"
 
     if [[ ! -e '/tmp/monitorix.deb' ]] || [[ $(sha256sum '/tmp/monitorix.deb' | cut -d' ' -f1) != $sha256sum ]]
     then
         ynh_die "Error : can't get monitorix debian package"
     fi
+	ynh_package_update
+	dpkg --force-confdef --force-confold -i /tmp/monitorix.deb
+	ynh_secure_remove /etc/monitorix/conf.d/00-debian.conf
+	ynh_package_install -f
 }
 
 config_nginx() {
