@@ -5,14 +5,14 @@ app=$YNH_APP_INSTANCE_NAME
 ## Adapt md5sum while you update app
 sha256sum="3fb8b4a4f7aeeeafccc6dc5b232f82d5761be80fe8e82008bc768f805fe5a744"
 
-get_app_version_from_json() {
+ynh_app_version() {
    manifest_path="../manifest.json"
     if [ ! -e "$manifest_path" ]; then
     	manifest_path="../settings/manifest.json"	# Into the restore script, the manifest is not at the same place
     fi
     echo $(grep '\"version\": ' "$manifest_path" | cut -d '"' -f 4)	# Retrieve the version number in the manifest file.
 }
-APP_VERSION=$(get_app_version_from_json)
+APP_VERSION=$(ynh_app_version)
 
 install_dependances() {
 	ynh_install_app_dependencies rrdtool perl libwww-perl libmailtools-perl libmime-lite-perl librrds-perl libdbi-perl libxml-simple-perl libhttp-server-simple-perl libconfig-general-perl pflogsumm

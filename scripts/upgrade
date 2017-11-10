@@ -18,6 +18,9 @@ dbuser=$app
 dbname=$app
 dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
 
+# Stop services
+systemctl stop monitorix.service
+
 # Download package and install it
 get_install_source
 
@@ -28,4 +31,4 @@ config_nginx
 config_monitorix
 
 # Reload services
-systemctl restart monitorix.service
+systemctl start monitorix.service
