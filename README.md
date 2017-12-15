@@ -1,6 +1,12 @@
 Monitorix
 =========
 
+A light monitoring tools.
+
+[![Integration level](https://dash.yunohost.org/integration/monitorix.svg)](https://ci-apps.yunohost.org/jenkins/job/monitorix%20%28Community%29/lastBuild/consoleFull) 
+
+[![Install Monitorix with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=monitorix)
+
 Install
 -------
 
