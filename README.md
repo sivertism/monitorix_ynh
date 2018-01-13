@@ -21,6 +21,11 @@ From command line:
 
 `sudo yunohost app upgrade -u https://github.com/YunoHost-Apps/monitorix_ynh`
 
+Issue
+-----
+
+Any issue is welcome here : https://github.com/YunoHost-Apps/monitorix_ynh/issues
+
 More sensor
 -----------
 
