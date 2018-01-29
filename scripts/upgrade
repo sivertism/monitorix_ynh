@@ -41,5 +41,8 @@ config_nginx
 # Update monitorix configuration
 config_monitorix
 
+# Set access
+set_permission
+
 # Reload services
 systemctl start monitorix.service

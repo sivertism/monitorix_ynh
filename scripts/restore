@@ -32,6 +32,9 @@ ynh_secure_remove /etc/monitorix # we remove the directory because if it is not 
 ynh_secure_remove /var/lib/monitorix
 ynh_restore
 
+# Set access
+set_permission
+
 # Reload nginx
 systemctl reload nginx.service
 

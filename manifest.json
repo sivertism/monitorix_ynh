@@ -14,7 +14,7 @@
         "email": "josue@familletille.ch"
     },
     "requirements": {
-		"yunohost": ">= 2.6.4"
+		"yunohost": ">= 2.7.9"
     },
     "multi_instance": false,
     "services": [
