@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#=================================================
+# GENERIC START
+#=================================================
+
 # Source YunoHost helpers
 source /usr/share/yunohost/helpers
 
@@ -7,11 +11,15 @@ source /usr/share/yunohost/helpers
 ynh_abort_if_errors
 
 # Import common cmd
+source ../settings/scripts/experimental_helper.sh
 source ../settings/scripts/_common.sh
 
 # Retrieve arguments
 domain=$(ynh_app_setting_get $app domain)
 
+#=================================================
+# STANDARD BACKUP STEPS
+#=================================================
 
 # Copy NGINX configuration
 domain=$(ynh_app_setting_get "$app" domain)

@@ -1,16 +1,22 @@
 #!/bin/bash
 
+#=================================================
+# GENERIC START
+#=================================================
+
 # Source YunoHost helpers
 source /usr/share/yunohost/helpers
 
-# Stop script if errors
-set -u
-
 # Import common cmd
+source ./experimental_helper.sh
 source ./_common.sh
 
 # Retrieve app settings
 domain=$(ynh_app_setting_get "$app" domain)
+
+#=================================================
+# STANDARD REMOVE
+#=================================================
 
 # Stop service
 systemctl stop monitorix.service

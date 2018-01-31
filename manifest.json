@@ -6,7 +6,7 @@
         "en": "A monitoring tools",
         "fr": "Un outils de monitoring"
     },
-	"version": "3.10.0",
+	"version": "3.10.0~ynh1",
     "url": "http://monitorix.org",
     "license": "GPL-2.0",
     "maintainer": {

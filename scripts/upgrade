@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#=================================================
+# GENERIC START
+#=================================================
+
 # Source YunoHost helpers
 source /usr/share/yunohost/helpers
 
@@ -7,6 +11,7 @@ source /usr/share/yunohost/helpers
 ynh_abort_if_errors
 
 # Import common cmd
+source ./experimental_helper.sh
 source ./_common.sh
 
 # Retrieve app settings
@@ -21,8 +26,6 @@ dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
 # Stop services
 systemctl stop monitorix.service
 
-# BACKUP BEFORE UPGRADE THEN ACTIVE TRAP
-
 # Backup the current version of the app
 ynh_backup_before_upgrade
 ynh_clean_setup () {
@@ -32,6 +35,10 @@ ynh_clean_setup () {
 # Exit if an error occurs during the execution of the script
 ynh_abort_if_errors
 
+#=================================================
+# STANDARD UPGRADE STEPS
+#=================================================
+
 # Download package and install it
 get_install_source
 
@@ -40,6 +47,10 @@ config_nginx
 
 # Update monitorix configuration
 config_monitorix
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
 
 # Set access
 set_permission
