@@ -3,7 +3,7 @@
 #=================================================
 
 ## Adapt md5sum while you update app
-sha256sum="3fb8b4a4f7aeeeafccc6dc5b232f82d5761be80fe8e82008bc768f805fe5a744"
+sha256sum="a974dd05f67562de85ce4a994cec7f0dcbe3cadad2c5f305131e3867af33a7ad"
 
 app=$YNH_APP_INSTANCE_NAME
 APP_VERSION=$(ynh_app_upstream_version)
