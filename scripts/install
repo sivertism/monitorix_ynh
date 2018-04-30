@@ -51,6 +51,14 @@ config_nginx
 # Update monitorix configuration
 config_monitorix
 
+# Add hook
+mkdir -p /usr/share/yunohost/hooks/post_iptable_rules
+cp ../conf/post_iptable_rules_hook /usr/share/yunohost/hooks/post_iptable_rules/50-$app
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+
 # Set access
 set_permission
 

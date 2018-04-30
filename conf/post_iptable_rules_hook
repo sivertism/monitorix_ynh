@@ -1,0 +1,6 @@
+#/bin/bash
+
+if [[ $(systemctl status monitorix.service | grep "Active" | cut -d'(' -f2 | cut -d ')' -f1) = 'running' ]]
+then
+    systemctl restart monitorix.service
+fi

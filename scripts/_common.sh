@@ -52,7 +52,6 @@ config_monitorix() {
 	ynh_replace_string __MYSQL_USER__ $dbuser $monitorix_conf
 	ynh_replace_string MYSQL_PASSWORD $dbpass $monitorix_conf
 	cp $monitorix_conf /etc/monitorix/monitorix.conf
-
 }
 
 set_permission() {

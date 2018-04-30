@@ -26,6 +26,9 @@ domain=$(ynh_app_setting_get "$app" domain)
 ynh_backup "/etc/nginx/conf.d/${domain}.d/${app}.conf" "nginx.conf"
 ynh_backup "/etc/nginx/conf.d/monitorix_status.conf" "monitorix_status.conf"
 
+# Copy hook
+ynh_backup "/usr/share/yunohost/hooks/post_iptable_rules/50-$app"
+
 # Copy Monitorix configuration
 ynh_backup "/etc/monitorix" "config"
 
