@@ -59,5 +59,10 @@ cp ../conf/post_iptable_rules_hook /usr/share/yunohost/hooks/post_iptable_rules/
 # Set access
 set_permission
 
-# Reload services
-systemctl start monitorix.service
+# Reload monitorix
+# While we call "restart" sometime for unknown reason monitorix don't cleanly restart. Probably on the stop instruction the webserver is not stoped before the new start instruction.
+# So this fix that
+sudo systemctl stop monitorix.service
+sleep 1
+sudo systemctl start monitorix.service
+sleep 10

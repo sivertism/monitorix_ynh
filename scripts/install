@@ -65,5 +65,10 @@ set_permission
 # register yunohost service
 yunohost service add monitorix
 
-# Reload services
-systemctl restart monitorix.service
+# Reload monitorix
+# While we call "restart" sometime for unknown reason monitorix don't cleanly restart. Probably on the stop instruction the webserver is not stoped before the new start instruction.
+# So this fix that
+sudo systemctl stop monitorix.service
+sleep 1
+sudo systemctl start monitorix.service
+sleep 10

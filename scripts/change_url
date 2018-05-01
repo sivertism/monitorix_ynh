@@ -65,10 +65,17 @@ fi
 
 # Update Monitorix Config
 ynh_replace_string "base_url = $old_path" "base_url = $new_path" /etc/monitorix/monitorix.conf
-ynh_replace_string "base_cgi = $old_path-cgi" "base_cgi = $new_path-cgi" /etc/monitorix/monitorix.conf
+ynh_replace_string "base_cgi = $old_path/cgi" "base_cgi = $new_path/cgi" /etc/monitorix/monitorix.conf
 ynh_replace_string "url_prefix = http://127.0.0.1:$http_port$old_path" "url_prefix = http://127.0.0.1:$http_port$new_path" /etc/monitorix/monitorix.conf
 ynh_replace_string "from_address = noreply@$old_domain" "from_address = noreply@$new_domain" /etc/monitorix/monitorix.conf
 
 # Reload services
 sudo systemctl reload nginx.service
-sudo systemctl restart monitorix.service
+
+# Reload monitorix
+# While we call "restart" sometime for unknown reason monitorix don't cleanly restart. Probably on the stop instruction the webserver is not stoped before the new start instruction.
+# So this fix that
+sudo systemctl stop monitorix.service
+sleep 1
+sudo systemctl start monitorix.service
+sleep 10
