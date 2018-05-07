@@ -16,10 +16,10 @@ source ../settings/scripts/_common.sh
 
 # Retrieve old app settings
 domain=$(ynh_app_setting_get "$app" domain)
-path=$(ynh_normalize_url_path $(ynh_app_setting_get "$app" path))
+path_url=$(ynh_normalize_url_path $(ynh_app_setting_get "$app" path))
 
 # Check domain/path availability
-ynh_webpath_available $domain $path || ynh_die "$domain/$path is not available, please use an other domain or path."
+ynh_webpath_available $domain $path_url || ynh_die "$domain/$path_url is not available, please use an other domain or path."
 
 #=================================================
 # STANDARD RESTORATION STEPS
@@ -52,9 +52,9 @@ set_permission
 systemctl reload nginx.service
 
 # Reload monitorix
-# While we call "restart" sometime for unknown reason monitorix don't cleanly restart. Probably on the stop instruction the webserver is not stoped before the new start instruction.
+# While we stop monitorix sometime the built-in web server is not stopped cleanly. So are sure that everything is cleanly stoped by that
 # So this fix that
-sudo systemctl stop monitorix.service
+systemctl stop monitorix.service
 sleep 1
-sudo systemctl start monitorix.service
-sleep 10
+pkill -f "monitorix-httpd listening on" || true
+ynh_check_starting ' - Ok, ready.' '/var/log/monitorix'

@@ -21,10 +21,6 @@ domain=$(ynh_app_setting_get "$app" domain)
 # Stop service
 systemctl stop monitorix.service
 
-# Suppression de la configuration nginx
-ynh_secure_remove "/etc/nginx/conf.d/$domain.d/$app.conf"
-systemctl reload nginx.service
-
 # Drop MySQL database and user
 dbname=$app
 dbuser=$app
@@ -34,6 +30,10 @@ ynh_mysql_drop_user "$dbuser" || true
 # Remove data
 ynh_secure_remove /var/lib/monitorix
 ynh_secure_remove /usr/share/yunohost/hooks/post_iptable_rules/50-$app
+
+# Remove nginx config
+ynh_secure_remove "/etc/nginx/conf.d/monitorix_status.conf"
+ynh_remove_nginx_config
 
 # Autoremove package
 ynh_remove_app_dependencies

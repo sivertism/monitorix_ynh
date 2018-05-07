@@ -30,28 +30,26 @@ get_install_source() {
 }
 
 config_nginx() {
-	nginx_conf=../conf/nginx.conf
-	ynh_replace_string __YNH_WWW_PATH__ $path $nginx_conf
-	ynh_replace_string __SERVICE_PORT__ $http_port $nginx_conf
-	cp $nginx_conf /etc/nginx/conf.d/$domain.d/$app.conf
-	
-	# Add special hostname for monitorix status
-	nginx_status_conf=../conf/nginx_status.conf
-	ynh_replace_string PORT $nginx_status_port $nginx_status_conf
-	cp $nginx_status_conf /etc/nginx/conf.d/monitorix_status.conf
-	
-	systemctl reload nginx.service
+    ynh_add_nginx_config
+
+    # Add special hostname for monitorix status
+	nginx_status_conf="/etc/nginx/conf.d/monitorix_status.conf"
+	cp ../conf/nginx_status.conf $nginx_status_conf
+	ynh_replace_string __PORT__ $nginx_status_port $nginx_status_conf
+
+    systemctl reload nginx
 }
 
 config_monitorix() {
-	monitorix_conf=../conf/monitorix.conf
-	ynh_replace_string __SERVICE_PORT__ $http_port $monitorix_conf
+	monitorix_conf=/etc/monitorix/monitorix.conf
+	cp ../conf/monitorix.conf $monitorix_conf 
+	ynh_replace_string __SERVICE_PORT__ $port $monitorix_conf
 	ynh_replace_string __YNH_DOMAIN__ $domain $monitorix_conf
 	ynh_replace_string __NGINX_STATUS_PORT__ $nginx_status_port $monitorix_conf
-	ynh_replace_string __YNH_WWW_PATH__ $path $monitorix_conf
+	ynh_replace_string "__YNH_WWW_PATH__/" "${path_url%/}/" $monitorix_conf
+	ynh_replace_string __YNH_WWW_PATH__ $path_url $monitorix_conf
 	ynh_replace_string __MYSQL_USER__ $dbuser $monitorix_conf
-	ynh_replace_string MYSQL_PASSWORD $dbpass $monitorix_conf
-	cp $monitorix_conf /etc/monitorix/monitorix.conf
+	ynh_replace_string __MYSQL_PASSWORD__ $dbpass $monitorix_conf
 }
 
 set_permission() {

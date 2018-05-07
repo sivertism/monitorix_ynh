@@ -16,17 +16,17 @@ source ./_common.sh
 
 # Retrieve arguments
 domain=$YNH_APP_ARG_DOMAIN
-path=$(ynh_normalize_url_path $YNH_APP_ARG_PATH)
+path_url=$(ynh_normalize_url_path $YNH_APP_ARG_PATH)
 
 # Check domain/path availability
-test $(ynh_webpath_available $domain $path) == 'True' || ynh_die "$domain$path is not available, please use an other domain or path."
-ynh_webpath_register $app $domain $path
+test $(ynh_webpath_available $domain $path_url) == 'True' || ynh_die "$domain$path_url is not available, please use an other domain or path."
+ynh_webpath_register $app $domain $path_url
 
 # Find a port for built-in monitorix HTTP server
-http_port=$(ynh_find_port 8080)
-nginx_status_port=$(ynh_find_port $(($http_port +1)))
+port=$(ynh_find_port 8080)
+nginx_status_port=$(ynh_find_port $(($port +1)))
 
-ynh_app_setting_set $app http_port $http_port
+ynh_app_setting_set $app http_port $port
 ynh_app_setting_set $app nginx_status_port $nginx_status_port
 
 #=================================================
@@ -66,9 +66,9 @@ set_permission
 yunohost service add monitorix
 
 # Reload monitorix
-# While we call "restart" sometime for unknown reason monitorix don't cleanly restart. Probably on the stop instruction the webserver is not stoped before the new start instruction.
+# While we stop monitorix sometime the built-in web server is not stopped cleanly. So are sure that everything is cleanly stoped by that
 # So this fix that
 sudo systemctl stop monitorix.service
 sleep 1
-sudo systemctl start monitorix.service
-sleep 10
+pkill -f "monitorix-httpd listening on" || true
+ynh_check_starting ' - Ok, ready.' '/var/log/monitorix'

@@ -16,8 +16,8 @@ source ./_common.sh
 
 # Retrieve app settings
 domain=$(ynh_app_setting_get "$app" domain)
-path=$(ynh_normalize_url_path $(ynh_app_setting_get "$app" path))
-http_port=$(ynh_app_setting_get "$app" http_port)
+path_url=$(ynh_normalize_url_path $(ynh_app_setting_get "$app" path))
+port=$(ynh_app_setting_get "$app" http_port)
 nginx_status_port=$(ynh_app_setting_get "$app" nginx_status_port)
 dbuser=$app
 dbname=$app
@@ -60,9 +60,9 @@ cp ../conf/post_iptable_rules_hook /usr/share/yunohost/hooks/post_iptable_rules/
 set_permission
 
 # Reload monitorix
-# While we call "restart" sometime for unknown reason monitorix don't cleanly restart. Probably on the stop instruction the webserver is not stoped before the new start instruction.
+# While we stop monitorix sometime the built-in web server is not stopped cleanly. So are sure that everything is cleanly stoped by that
 # So this fix that
 sudo systemctl stop monitorix.service
 sleep 1
-sudo systemctl start monitorix.service
-sleep 10
+pkill -f "monitorix-httpd listening on" || true
+ynh_check_starting ' - Ok, ready.' '/var/log/monitorix'

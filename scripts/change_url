@@ -15,67 +15,41 @@ source ./experimental_helper.sh
 source ./_common.sh
 
 # Retrive arguments
+path_url=$(ynh_normalize_url_path ${YNH_APP_NEW_PATH:-'/'})
 old_domain=$YNH_APP_OLD_DOMAIN
-old_path=$YNH_APP_OLD_PATH
-
-new_domain=$YNH_APP_NEW_DOMAIN
-new_path=$YNH_APP_NEW_PATH
-
-test -n "$old_path" || old_path="/"
-test -n "$new_path" || new_path="/"
-
-new_path=$(ynh_normalize_url_path $new_path)
-old_path=$(ynh_normalize_url_path $old_path)
-
-http_port=$(ynh_app_setting_get "$app" http_port)
-
-# CHECK WHICH PARTS SHOULD BE CHANGED
-change_domain=0
-if [ "$old_domain" != "$new_domain" ]
-then
-	change_domain=1
-fi
-
-change_path=0
-if [ "$old_path" != "$new_path" ]
-then
-	change_path=1
-fi
+domain=$YNH_APP_NEW_DOMAIN
+port=$(ynh_app_setting_get "$app" http_port)
+nginx_status_port=$(ynh_app_setting_get "$app" nginx_status_port)
+dbuser=$app
+dbname=$app
+dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
 
 #=================================================
 # STANDARD MODIFICATIONS
 #=================================================
 
-# MODIFY URL IN NGINX CONF
-nginx_conf_path=/etc/nginx/conf.d/$old_domain.d/$app.conf
-
-# Change the path in the nginx config file
-if [ $change_path -eq 1 ]
+# Update nginx config
+if [ "$old_domain" != "$domain" ]
 then
-	ynh_replace_string "location $old_path" "location $new_path" "$nginx_conf_path"
-	ynh_replace_string "http://127.0.0.1:$http_port$old_path;" "http://127.0.0.1:$http_port$new_path;" "$nginx_conf_path"
-	ynh_replace_string "location ~ ^$old_path/(.+\.png)$" "location ~ ^$new_path/(.+\.png)$" "$nginx_conf_path"
+    old_file_path="/etc/nginx/conf.d/$old_domain.d/$app.conf"
+    new_file_path="/etc/nginx/conf.d/$domain.d/$app.conf"
+    mv "$old_file_path" "$new_file_path"
+
+    # Change the checksum setting name
+    checksum_setting_old_name=checksum_${old_file_path//[\/ ]/_}
+    checksum_setting_new_name=checksum_${new_file_path//[\/ ]/_}
+    checksum_value=$(ynh_app_setting_get $app $checksum_setting_old_name)
+    ynh_app_setting_set $app $checksum_setting_new_name $checksum_value
 fi
+config_nginx
 
-# Change the domain for nginx
-if [ $change_domain -eq 1 ]
-then
-	sudo mv $nginx_conf_path /etc/nginx/conf.d/$new_domain.d/$app.conf
-fi
-
-# Update Monitorix Config
-ynh_replace_string "base_url = $old_path" "base_url = $new_path" /etc/monitorix/monitorix.conf
-ynh_replace_string "base_cgi = $old_path/cgi" "base_cgi = $new_path/cgi" /etc/monitorix/monitorix.conf
-ynh_replace_string "url_prefix = http://127.0.0.1:$http_port$old_path" "url_prefix = http://127.0.0.1:$http_port$new_path" /etc/monitorix/monitorix.conf
-ynh_replace_string "from_address = noreply@$old_domain" "from_address = noreply@$new_domain" /etc/monitorix/monitorix.conf
-
-# Reload services
-sudo systemctl reload nginx.service
+# Update monitorix configuration
+config_monitorix
 
 # Reload monitorix
-# While we call "restart" sometime for unknown reason monitorix don't cleanly restart. Probably on the stop instruction the webserver is not stoped before the new start instruction.
+# While we stop monitorix sometime the built-in web server is not stopped cleanly. So are sure that everything is cleanly stoped by that
 # So this fix that
-sudo systemctl stop monitorix.service
+systemctl stop monitorix.service
 sleep 1
-sudo systemctl start monitorix.service
-sleep 10
+pkill -f "monitorix-httpd listening on" || true
+ynh_check_starting ' - Ok, ready.' '/var/log/monitorix'
