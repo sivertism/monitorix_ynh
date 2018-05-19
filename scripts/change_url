@@ -31,15 +31,13 @@ dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
 # Update nginx config
 if [ "$old_domain" != "$domain" ]
 then
-    old_file_path="/etc/nginx/conf.d/$old_domain.d/$app.conf"
-    new_file_path="/etc/nginx/conf.d/$domain.d/$app.conf"
-    mv "$old_file_path" "$new_file_path"
+    # Delete file checksum for the old conf file location
+    ynh_delete_file_checksum "/etc/nginx/conf.d/$old_domain.d/$app.conf"
 
-    # Change the checksum setting name
-    checksum_setting_old_name=checksum_${old_file_path//[\/ ]/_}
-    checksum_setting_new_name=checksum_${new_file_path//[\/ ]/_}
-    checksum_value=$(ynh_app_setting_get $app $checksum_setting_old_name)
-    ynh_app_setting_set $app $checksum_setting_new_name $checksum_value
+    mv "/etc/nginx/conf.d/$old_domain.d/$app.conf" "/etc/nginx/conf.d/$domain.d/$app.conf"
+
+    # Store file checksum for the new config file location
+    ynh_store_file_checksum "/etc/nginx/conf.d/$domain.d/$app.conf"
 fi
 config_nginx
 
