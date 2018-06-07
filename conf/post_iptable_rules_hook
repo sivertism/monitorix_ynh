@@ -2,5 +2,8 @@
 
 if [[ $(systemctl status monitorix.service | grep "Active" | cut -d'(' -f2 | cut -d ')' -f1) = 'running' ]]
 then
-    systemctl restart monitorix.service
+    systemctl stop monitorix.service
+    sleep 1
+    pkill -f "monitorix-httpd listening on" || true
+    systemctl start monitorix.service
 fi
