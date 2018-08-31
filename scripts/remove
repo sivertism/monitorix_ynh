@@ -29,7 +29,6 @@ ynh_mysql_drop_user "$dbuser" || true
 
 # Remove data
 ynh_secure_remove /var/lib/monitorix
-ynh_secure_remove /usr/share/yunohost/hooks/post_iptable_rules/50-$app
 
 # Remove nginx config
 ynh_secure_remove "/etc/nginx/conf.d/monitorix_status.conf"
