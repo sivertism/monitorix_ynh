@@ -2,11 +2,7 @@
 # SET ALL CONSTANTS
 #=================================================
 
-## Adapt md5sum while you update app
-sha256sum="a974dd05f67562de85ce4a994cec7f0dcbe3cadad2c5f305131e3867af33a7ad"
-
 app=$YNH_APP_INSTANCE_NAME
-APP_VERSION=$(ynh_app_upstream_version)
 
 #=================================================
 # DEFINE ALL COMMON FONCTIONS
@@ -17,14 +13,10 @@ install_dependances() {
 }
 
 get_install_source() {
-    wget -q -O '/tmp/monitorix.deb' "http://www.monitorix.org/monitorix_${APP_VERSION}-izzy1_all.deb"
+	ynh_setup_source /tmp
 
-    if [[ ! -e '/tmp/monitorix.deb' ]] || [[ $(sha256sum '/tmp/monitorix.deb' | cut -d' ' -f1) != $sha256sum ]]
-    then
-        ynh_die "Error : can't get monitorix debian package"
-    fi
 	ynh_package_update
-	dpkg --force-confdef --force-confold -i /tmp/monitorix.deb
+	dpkg --force-confdef --force-confold -i /tmp/app.deb
 	ynh_secure_remove /etc/monitorix/conf.d/00-debian.conf
 	ynh_package_install -f
 }
