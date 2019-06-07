@@ -14,31 +14,37 @@ ynh_abort_if_errors
 source ../settings/scripts/experimental_helper.sh
 source ../settings/scripts/_common.sh
 
+ynh_script_progression --message="Loading settings..."
+
 # Retrieve old app settings
-domain=$(ynh_app_setting_get "$app" domain)
-path_url=$(ynh_normalize_url_path $(ynh_app_setting_get "$app" path))
+domain=$(ynh_app_setting_get --app $app --key domain)
+path_url=$(ynh_normalize_url_path --path_url $(ynh_app_setting_get --app $app --key path))
 
 # Check domain/path availability
-ynh_webpath_available $domain $path_url || ynh_die "$domain/$path_url is not available, please use an other domain or path."
+ynh_webpath_available --domain $domain --path_url $path_url || ynh_die --message "$domain/$path_url is not available, please use an other domain or path."
 
 #=================================================
 # STANDARD RESTORATION STEPS
 #=================================================
 
-# Install package    
+# Install package
+ynh_script_progression --message="Reinstalling dependencies..." --weight=5
 install_dependances
 
 # Download package and install it
+ynh_script_progression --message="Installing sources files..." --weight=7
 get_install_source
 
 # Create user for database
+ynh_script_progression --message="Configuring MySQL database..."
 dbuser=$app
-dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
+dbpass=$(ynh_app_setting_get --app $app --key mysqlpwd)
 ynh_mysql_create_user $dbuser $dbpass
 
 # Restore all config and data
-ynh_secure_remove /etc/monitorix # we remove the directory because if it is not empty the ynh_restore cmd fail
-ynh_secure_remove /var/lib/monitorix
+ynh_script_progression --message="Restoring files..." --weight=10
+ynh_secure_remove --file=/etc/monitorix # we remove the directory because if it is not empty the ynh_restore cmd fail
+ynh_secure_remove --file=/var/lib/monitorix
 ynh_restore
 
 #=================================================
@@ -46,15 +52,19 @@ ynh_restore
 #=================================================
 
 # Set access
+ynh_script_progression --message="Protecting directory..."
 set_permission
 
 # Reload nginx
 systemctl reload nginx.service
 
 # Reload monitorix
+ynh_script_progression --message="Starting monitorix services..." --weight=3
 # While we stop monitorix sometime the built-in web server is not stopped cleanly. So are sure that everything is cleanly stoped by that
 # So this fix that
 systemctl stop monitorix.service
 sleep 1
 pkill -f "monitorix-httpd listening on" || true
-ynh_check_starting ' - Ok, ready.' '/var/log/monitorix'
+ynh_systemd_action -l ' - Ok, ready.' -p '/var/log/monitorix'
+
+ynh_script_progression --message="Restoration completed for $app" --last

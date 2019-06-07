@@ -14,16 +14,19 @@ ynh_abort_if_errors
 source ./experimental_helper.sh
 source ./_common.sh
 
+ynh_script_progression --message="Loading installation settings..."
+
 # Retrieve app settings
-domain=$(ynh_app_setting_get "$app" domain)
-path_url=$(ynh_normalize_url_path $(ynh_app_setting_get "$app" path))
-port=$(ynh_app_setting_get "$app" http_port)
-nginx_status_port=$(ynh_app_setting_get "$app" nginx_status_port)
+domain=$(ynh_app_setting_get --app $app --key domain)
+path_url=$(ynh_normalize_url_path --path_url $(ynh_app_setting_get --app $app --key path))
+port=$(ynh_app_setting_get --app $app --key http_port)
+nginx_status_port=$(ynh_app_setting_get --app $app --key nginx_status_port)
 dbuser=$app
 dbname=$app
-dbpass=$(ynh_app_setting_get "$app" mysqlpwd)
+dbpass=$(ynh_app_setting_get --app $app --key mysqlpwd)
 
 # Stop services
+ynh_script_progression --message="Stoping services..."
 systemctl stop monitorix.service
 
 # Backup the current version of the app
@@ -40,28 +43,34 @@ ynh_abort_if_errors
 #=================================================
 
 # Download package and install it
+ynh_script_progression --message="Upgrading source files..." --weight=6
 get_install_source
 
 # Update nginx config
 config_nginx
 
 # Update monitorix configuration
+ynh_script_progression --message="Configuring application..."
 config_monitorix
 
 # Remove old hook if exist
-ynh_secure_remove /usr/share/yunohost/hooks/post_iptable_rules/50-$app
+ynh_secure_remove --file=/usr/share/yunohost/hooks/post_iptable_rules/50-$app
 
 #=================================================
 # GENERIC FINALIZATION
 #=================================================
 
 # Set access
+ynh_script_progression --message="Protecting directory..."
 set_permission
 
 # Reload monitorix
 # While we stop monitorix sometime the built-in web server is not stopped cleanly. So are sure that everything is cleanly stoped by that
 # So this fix that
-sudo systemctl stop monitorix.service
+ynh_script_progression --message="Starting monitorix services..." --weight=3
+systemctl stop monitorix.service
 sleep 1
 pkill -f "monitorix-httpd listening on" || true
-ynh_check_starting ' - Ok, ready.' '/var/log/monitorix'
+ynh_systemd_action -l ' - Ok, ready.' -p '/var/log/monitorix'
+
+ynh_script_progression --message="Upgrade of $app completed" --last

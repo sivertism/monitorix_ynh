@@ -13,11 +13,11 @@ install_dependances() {
 }
 
 get_install_source() {
-	ynh_setup_source /tmp
+	ynh_setup_source --dest_dir /tmp
 
 	ynh_package_update
 	dpkg --force-confdef --force-confold -i /tmp/app.deb
-	ynh_secure_remove /etc/monitorix/conf.d/00-debian.conf
+	ynh_secure_remove --file=/etc/monitorix/conf.d/00-debian.conf
 	ynh_package_install -f
 }
 
@@ -27,7 +27,7 @@ config_nginx() {
     # Add special hostname for monitorix status
 	nginx_status_conf="/etc/nginx/conf.d/monitorix_status.conf"
 	cp ../conf/nginx_status.conf $nginx_status_conf
-	ynh_replace_string __PORT__ $nginx_status_port $nginx_status_conf
+	ynh_replace_string --match_string __PORT__ --replace_string $nginx_status_port --target_file $nginx_status_conf
 
     systemctl reload nginx
 }
@@ -35,13 +35,13 @@ config_nginx() {
 config_monitorix() {
 	monitorix_conf=/etc/monitorix/monitorix.conf
 	cp ../conf/monitorix.conf $monitorix_conf 
-	ynh_replace_string __SERVICE_PORT__ $port $monitorix_conf
-	ynh_replace_string __YNH_DOMAIN__ $domain $monitorix_conf
-	ynh_replace_string __NGINX_STATUS_PORT__ $nginx_status_port $monitorix_conf
-	ynh_replace_string "__YNH_WWW_PATH__/" "${path_url%/}/" $monitorix_conf
-	ynh_replace_string __YNH_WWW_PATH__ $path_url $monitorix_conf
-	ynh_replace_string __MYSQL_USER__ $dbuser $monitorix_conf
-	ynh_replace_string __MYSQL_PASSWORD__ $dbpass $monitorix_conf
+	ynh_replace_string --match_string __SERVICE_PORT__ --replace_string $port --target_file $monitorix_conf
+	ynh_replace_string --match_string __YNH_DOMAIN__ --replace_string $domain --target_file $monitorix_conf
+	ynh_replace_string --match_string __NGINX_STATUS_PORT__ --replace_string $nginx_status_port --target_file $monitorix_conf
+	ynh_replace_string --match_string __YNH_WWW_PATH__/ --replace_string "${path_url%/}/" --target_file $monitorix_conf
+	ynh_replace_string --match_string __YNH_WWW_PATH__ --replace_string $path_url --target_file $monitorix_conf
+	ynh_replace_string --match_string __MYSQL_USER__ --replace_string $dbuser --target_file $monitorix_conf
+	ynh_replace_string --match_string __MYSQL_PASSWORD__ --replace_string $dbpass --target_file $monitorix_conf
 }
 
 set_permission() {

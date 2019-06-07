@@ -39,10 +39,8 @@ This app have no specific authentification and no specific user management.
 
 ### Supported architectures
 
-* x86-64b - [![Build Status](https://ci-apps.yunohost.org/ci/logs/monitorix%20(Community).svg)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
-* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/monitorix%20(Community).svg)](https://ci-apps-arm.yunohost.org/ci/apps/monitorix/)
-* Jessie x86-64b - [![Build Status](https://ci-stretch.nohost.me/jenkins/job/monitorix%20(Community).svg)](https://ci-stretch.nohost.me/jenkins/job/monitorix/)
-
+* x86-64b - [![Build Status](https://ci-apps.yunohost.org/ci/logs/monitorix%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
+* ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/monitorix%20%28Apps%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/monitorix/)
 
 <!--Limitations
 -----------

@@ -7,35 +7,47 @@
 # Source YunoHost helpers
 source /usr/share/yunohost/helpers
 
+# Stop script if errors
+set -u
+
 # Import common cmd
 source ./experimental_helper.sh
 source ./_common.sh
 
+ynh_script_progression --message="Loading installation settings..."
+
+
 # Retrieve app settings
-domain=$(ynh_app_setting_get "$app" domain)
+domain=$(ynh_app_setting_get --app $app --key domain)
 
 #=================================================
 # STANDARD REMOVE
 #=================================================
 
 # Stop service
+ynh_script_progression --message="Stoping services..."
 systemctl stop monitorix.service
 
 # Drop MySQL database and user
+ynh_script_progression --message="Removing databases..."
 dbname=$app
 dbuser=$app
 ynh_mysql_drop_db "$dbname" || true
 ynh_mysql_drop_user "$dbuser" || true
 
 # Remove data
-ynh_secure_remove /var/lib/monitorix
+ynh_script_progression --message="Removing logs..."
+ynh_secure_remove --file=/var/lib/monitorix
 
 # Remove nginx config
-ynh_secure_remove "/etc/nginx/conf.d/monitorix_status.conf"
+ynh_secure_remove --file="/etc/nginx/conf.d/monitorix_status.conf"
 ynh_remove_nginx_config
 
 # Autoremove package
+ynh_script_progression --message="Removing dependencies" --weight=10
 ynh_remove_app_dependencies
 ynh_package_autoremove monitorix
 
 yunohost service remove monitorix
+
+ynh_script_progression --message="Removal of $app completed" --last
