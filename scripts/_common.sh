@@ -33,6 +33,18 @@ config_nginx() {
 }
 
 config_monitorix() {
+    jail_list=$(fail2ban-client status | grep 'Jail list:' | sed 's/.*Jail list://' | sed 's/,//g')
+    additional_jail=""
+    for jail in $jail_list; do
+        if ! [[ "$jail" =~ (recidive|pam-generic|yunohost|postfix|postfix-sasl|dovecot|nginx-http-auth|sshd|sshd-ddos) ]]; then
+            if [ -z "$additional_jail" ]; then
+                additional_jail="[$jail]"
+            else
+                additional_jail+=", [$jail]"
+            fi
+        fi
+    done
+
 	monitorix_conf=/etc/monitorix/monitorix.conf
 	cp ../conf/monitorix.conf $monitorix_conf 
 	ynh_replace_string --match_string __SERVICE_PORT__ --replace_string $port --target_file $monitorix_conf
@@ -42,6 +54,7 @@ config_monitorix() {
 	ynh_replace_string --match_string __YNH_WWW_PATH__ --replace_string $path_url --target_file $monitorix_conf
 	ynh_replace_string --match_string __MYSQL_USER__ --replace_string $dbuser --target_file $monitorix_conf
 	ynh_replace_string --match_string __MYSQL_PASSWORD__ --replace_string $dbpass --target_file $monitorix_conf
+	ynh_replace_string --match_string __F2B_ADDITIONAL_JAIL__ --replace_string $additional_jail --target_file $monitorix_conf
 }
 
 set_permission() {
