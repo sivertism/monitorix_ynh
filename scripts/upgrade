@@ -4,15 +4,15 @@
 # GENERIC START
 #=================================================
 
+# Import common cmd
+source ./experimental_helper.sh
+source ./_common.sh
+
 # Source YunoHost helpers
 source /usr/share/yunohost/helpers
 
 # Stop script if errors
 ynh_abort_if_errors
-
-# Import common cmd
-source ./experimental_helper.sh
-source ./_common.sh
 
 ynh_script_progression --message="Loading installation settings..."
 
@@ -67,6 +67,9 @@ ynh_secure_remove --file=/usr/share/yunohost/hooks/post_iptable_rules/50-$app
 # Set access
 ynh_script_progression --message="Protecting directory..."
 set_permission
+
+# register yunohost service
+yunohost service add monitorix
 
 # Reload monitorix
 # While we stop monitorix sometime the built-in web server is not stopped cleanly. So are sure that everything is cleanly stoped by that

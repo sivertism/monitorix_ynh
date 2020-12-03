@@ -1,7 +1,7 @@
 Monitorix For yunohost
 ======================
 
-[![Integration level](https://dash.yunohost.org/integration/monitorix.svg)](https://ci-apps.yunohost.org/ci/apps/monitorix%20%28Community%29/lastBuild/consoleFull)  
+[![Integration level](https://dash.yunohost.org/integration/monitorix.svg)](https://dash.yunohost.org/appci/app/monitorix) ![](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)  
 [![Install monitorix with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=monitorix)
 
 > *This package allow you to install monitorix quickly and simply on a YunoHost server.  
@@ -39,7 +39,7 @@ This app have no specific authentification and no specific user management.
 
 ### Supported architectures
 
-* x86-64b - [![Build Status](https://ci-apps.yunohost.org/ci/logs/monitorix%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
+* x86-64 - [![Build Status](https://ci-apps.yunohost.org/ci/logs/monitorix%20%28Apps%29.svg)](https://ci-apps.yunohost.org/ci/apps/monitorix/)
 * ARMv8-A - [![Build Status](https://ci-apps-arm.yunohost.org/ci/logs/monitorix%20%28Apps%29.svg)](https://ci-apps-arm.yunohost.org/ci/apps/monitorix/)
 
 <!--Limitations
