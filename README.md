@@ -2,7 +2,7 @@ Monitorix For yunohost
 ======================
 
 [![Integration level](https://dash.yunohost.org/integration/monitorix.svg)](https://dash.yunohost.org/appci/app/monitorix) ![](https://ci-apps.yunohost.org/ci/badges/monitorix.status.svg) ![](https://ci-apps.yunohost.org/ci/badges/monitorix.maintain.svg)  
-[![Install monitorix with YunoHost](https://install-app.yunohost.org/install-with-yunohost.png)](https://install-app.yunohost.org/?app=monitorix)
+[![Install monitorix with YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=monitorix)
 
 > *This package allow you to install monitorix quickly and simply on a YunoHost server.  
 If you don't have YunoHost, please see [here](https://yunohost.org/#/install) to know how to install and enjoy it.*
