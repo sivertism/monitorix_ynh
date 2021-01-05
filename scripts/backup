@@ -15,7 +15,7 @@ source /usr/share/yunohost/helpers
 ynh_abort_if_errors
 
 # Retrieve arguments
-ynh_script_progression --message="Loading installation settings..."
+ynh_print_info --message="Loading installation settings..."
 domain=$(ynh_app_setting_get --app $app --key domain)
 
 #=================================================
@@ -23,7 +23,7 @@ domain=$(ynh_app_setting_get --app $app --key domain)
 #=================================================
 
 # Copy NGINX configuration
-ynh_script_progression --message="Backing up configuration..."
+ynh_print_info --message="Backing up configuration..."
 domain=$(ynh_app_setting_get --app $app --key domain)
 ynh_backup --src_path "/etc/nginx/conf.d/${domain}.d/${app}.conf"
 ynh_backup --src_path "/etc/nginx/conf.d/monitorix_status.conf"
@@ -35,7 +35,7 @@ ynh_backup --src_path "/etc/yunohost/hooks.d/post_iptable_rules/50-$app"
 ynh_backup --src_path "/etc/monitorix"
 
 # Copy Monitorix data
-ynh_script_progression --message="Backing up data..." --weight=10
+ynh_print_info --message="Backing up data..."
 ynh_backup --src_path "/var/lib/monitorix"
 
-ynh_script_progression --message="Backup script completed for $app. (YunoHost will then actually copy those files to the archive)." --last
+ynh_print_info --message="Backup script completed for $app. (YunoHost will then actually copy those files to the archive)."
